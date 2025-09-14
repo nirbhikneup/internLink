@@ -1,4 +1,8 @@
 import { supabaseServer } from "@root/lib/supabase/server";
+import dynamic from "next/dynamic";
+
+// Dynamically load client form (so it's not SSR)
+const AddJobForm = dynamic(() => import("@/components/AddJobForm"), { ssr: false });
 
 type Job = {
     id: number;
@@ -19,8 +23,8 @@ export default async function JobsPage() {
     if (error) {
         return (
             <main style={{ padding: 12 }}>
-                <h1> Jobs </h1>
-                <p style={{ color: "crimson" }}> Failed to load jobs: {error.message}</p>
+                <h1>Jobs</h1>
+                <p style={{ color: "crimson" }}>Failed to load jobs: {error.message}</p>
             </main>
         );
     }
@@ -30,14 +34,20 @@ export default async function JobsPage() {
     return (
         <main style={{ padding: 12 }}>
             <h1>Jobs</h1>
+
             <ul style={{ marginTop: 12 }}>
                 {jobs.map((j) => (
                     <li key={j.id} style={{ padding: "8px 0", borderBottom: "1px solid #eee" }}>
-                        <div><b>{j.title}</b> - {j.company}</div>
-                        <small> {j.remote ? "Remote ✅" : "On-Site"}</small>
+                        <div>
+                            <b>{j.title}</b> — {j.company}
+                        </div>
+                        <small>{j.remote ? "Remote ✅" : "On-Site"}</small>
                     </li>
                 ))}
             </ul>
+
+            {/* Add new jobs via form */}
+            <AddJobForm />
         </main>
-    )
+    );
 }
